@@ -730,6 +730,26 @@ p {
 .install-banner small {
   opacity: 0.8;
 }
+.storage-status {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: var(--r);
+}
+.storage-status svg {
+  flex: none;
+  margin-top: 1px;
+}
+.storage-status.ok {
+  color: var(--olive);
+  background: color-mix(in srgb, var(--olive) 10%, transparent);
+}
+.storage-status.warn {
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 10%, transparent);
+}
 .footer-note {
   text-align: center;
   font-size: 12px;

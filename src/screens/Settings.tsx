@@ -1,7 +1,8 @@
-import { useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   IconChevronRight, IconDatabaseExport, IconDeviceMobileDown, IconFileSpreadsheet, IconPlus, IconRestore, IconShare,
+  IconShieldCheck, IconShieldExclamation,
 } from '@tabler/icons-react'
 import { db, type Category, type Recurring } from '../lib/db'
 import { buildBackup, buildCSV, canShareFiles, downloadFile, restoreBackup, shareFile } from '../lib/export'
@@ -31,6 +32,17 @@ export function Settings({ month, installPrompt, onInstalled, onEditCategory, on
   const count = useLiveQuery(() => db.expenses.count())
   const fileInput = useRef<HTMLInputElement>(null)
   const [shareable] = useState(canShareFiles)
+  const [persisted, setPersisted] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    navigator.storage?.persisted?.().then(setPersisted)
+  }, [])
+
+  async function askPersist() {
+    const granted = (await navigator.storage?.persist?.()) ?? false
+    setPersisted(granted)
+    if (!granted) toast("Chrome refuse pour l'instant. Installe l'appli puis réessaie.")
+  }
 
   const stamp = todayISO()
   const exports = [
@@ -189,6 +201,19 @@ export function Settings({ month, installPrompt, onInstalled, onEditCategory, on
           </button>
           <input ref={fileInput} type="file" accept="application/json,.json" hidden onChange={(e) => onRestore(e.target.files?.[0])} />
         </div>
+        {persisted === true && (
+          <p className="storage-status ok">
+            <IconShieldCheck size={18} /> Stockage protégé : Chrome ne l'effacera pas pour faire de la place.
+          </p>
+        )}
+        {persisted === false && (
+          <button className="storage-status warn" onClick={askPersist}>
+            <IconShieldExclamation size={18} />
+            <span>
+              Stockage non protégé : Chrome peut l'effacer s'il manque de place. Installe l'appli, puis touche ici pour le protéger.
+            </span>
+          </button>
+        )}
         <p className="hint">Tes données restent uniquement sur ce téléphone. Fais une sauvegarde de temps en temps (Drive, mail…).</p>
       </section>
 

@@ -24,6 +24,8 @@ export default function App() {
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null)
 
   useEffect(() => {
+    // Sans ça, Chrome peut effacer les données du site pour libérer de la place.
+    navigator.storage?.persist?.()
     runRecurring()
     // L'appli peut rester ouverte en arrière-plan plusieurs jours : on revérifie à chaque retour.
     const onVisible = () => {
