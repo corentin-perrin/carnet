@@ -10,6 +10,7 @@ import { money, monthName, monthYear, shortDate, todayISO } from '../lib/format'
 import { useCategories, useCategoryMap } from '../lib/hooks'
 import { CatIcon } from '../lib/icons'
 import { nextOccurrence } from '../lib/recurring'
+import { Diagnostics } from '../components/Diagnostics'
 import { useToast } from '../components/Toast'
 
 export interface InstallPrompt extends Event {
@@ -216,6 +217,8 @@ export function Settings({ month, installPrompt, onInstalled, onEditCategory, on
         )}
         <p className="hint">Tes données restent uniquement sur ce téléphone. Fais une sauvegarde de temps en temps (Drive, mail…).</p>
       </section>
+
+      <Diagnostics />
 
       <p className="footer-note">Carnet · v{__APP_VERSION__}</p>
     </>

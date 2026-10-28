@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { IconTrash } from '@tabler/icons-react'
+import { describeError } from '../lib/errors'
 import { db, type Recurring } from '../lib/db'
 import { centsToInput, dateInMonth, monthOf, parseAmount, todayISO } from '../lib/format'
 import { useCategories } from '../lib/hooks'
@@ -64,7 +65,7 @@ export function RecurringSheet({ recurring, onClose }: Props) {
           className="form"
           onSubmit={(e) => {
             e.preventDefault()
-            save(close)
+            save(close).catch((err) => setError(describeError(err)))
           }}
         >
           <label className="amount-field">
@@ -104,7 +105,7 @@ export function RecurringSheet({ recurring, onClose }: Props) {
 
           <div className="form-actions">
             {!isNew && (
-              <button type="button" className="btn btn-ghost-danger" onClick={() => remove(close)} aria-label="Supprimer">
+              <button type="button" className="btn btn-ghost-danger" onClick={() => remove(close).catch((err) => setError(describeError(err)))} aria-label="Supprimer">
                 <IconTrash size={20} />
               </button>
             )}

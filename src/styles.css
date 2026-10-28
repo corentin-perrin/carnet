@@ -750,6 +750,26 @@ p {
   color: var(--terra-deep);
   background: color-mix(in srgb, var(--terra) 10%, transparent);
 }
+.diagnostics {
+  padding: 4px 0 12px;
+}
+.diagnostics dl {
+  margin: 0 0 6px;
+  font-size: 13px;
+}
+.diagnostics dl > div {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 8px;
+  padding: 4px 0;
+}
+.diagnostics dt {
+  color: var(--muted);
+}
+.diagnostics dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
 .footer-note {
   text-align: center;
   font-size: 12px;

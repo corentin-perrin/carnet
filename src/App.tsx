@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { Category, Expense, Recurring } from './lib/db'
 import { monthOf, todayISO } from './lib/format'
+import { describeError } from './lib/errors'
 import { runRecurring } from './lib/recurring'
+import { useToast } from './components/Toast'
 import { BottomNav, type Tab } from './components/BottomNav'
 import { CategorySheet } from './components/CategorySheet'
 import { ExpenseSheet } from './components/ExpenseSheet'
@@ -22,6 +24,7 @@ export default function App() {
   const [month, setMonth] = useState(() => monthOf(todayISO()))
   const [sheet, setSheet] = useState<SheetState>(null)
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null)
+  const toast = useToast()
 
   useEffect(() => {
     // Sans ça, Chrome peut effacer les données du site pour libérer de la place.
@@ -31,6 +34,9 @@ export default function App() {
     const onVisible = () => {
       if (document.visibilityState === 'visible') runRecurring()
     }
+    // Filet de sécurité : une erreur de stockage ne doit jamais passer inaperçue.
+    const onUnhandled = (e: PromiseRejectionEvent) => toast(describeError(e.reason))
+    window.addEventListener('unhandledrejection', onUnhandled)
     const onInstallable = (e: Event) => {
       e.preventDefault()
       setInstallPrompt(e as InstallPrompt)
@@ -40,8 +46,9 @@ export default function App() {
     return () => {
       document.removeEventListener('visibilitychange', onVisible)
       window.removeEventListener('beforeinstallprompt', onInstallable)
+      window.removeEventListener('unhandledrejection', onUnhandled)
     }
-  }, [])
+  }, [toast])
 
   function goTo(next: Tab) {
     setTab(next)
