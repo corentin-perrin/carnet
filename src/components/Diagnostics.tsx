@@ -1,18 +1,8 @@
 import { useState, type CSSProperties } from 'react'
 import { IconCopy, IconStethoscope } from '@tabler/icons-react'
 import { db } from '../lib/db'
-import { describeError } from '../lib/errors'
+import { describeError, withTimeout } from '../lib/errors'
 import { useToast } from './Toast'
-
-const TIMEOUT_MS = 5000
-
-/** Rejette si le stockage ne répond pas : un IndexedDB bloqué ne renvoie jamais d'erreur, il attend. */
-function withTimeout<T>(promise: Promise<T>): Promise<T> {
-  return Promise.race([
-    promise,
-    new Promise<T>((_, reject) => setTimeout(() => reject({ name: 'Timeout', message: `pas de réponse au bout de ${TIMEOUT_MS / 1000} s` }), TIMEOUT_MS)),
-  ])
-}
 
 const mb = (bytes?: number) => (bytes === undefined ? '?' : `${(bytes / 1024 / 1024).toFixed(1)} Mo`)
 

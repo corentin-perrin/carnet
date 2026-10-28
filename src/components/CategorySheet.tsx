@@ -1,7 +1,7 @@
 import { useState, type CSSProperties } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { IconCheck, IconTrash } from '@tabler/icons-react'
-import { describeError } from '../lib/errors'
+import { describeError, withTimeout } from '../lib/errors'
 import { db, PALETTE, type Category } from '../lib/db'
 import { CATEGORY_ICONS, CatIcon } from '../lib/icons'
 import { Sheet } from './Sheet'
@@ -54,7 +54,7 @@ export function CategorySheet({ category, onClose }: Props) {
           className="form"
           onSubmit={(e) => {
             e.preventDefault()
-            save(close).catch((err) => setError(describeError(err)))
+            withTimeout(save(close)).catch((err) => setError(describeError(err)))
           }}
         >
           <div className="cat-preview" style={{ '--c': color } as CSSProperties}>
@@ -106,7 +106,7 @@ export function CategorySheet({ category, onClose }: Props) {
 
           <div className="form-actions">
             {!isNew && (
-              <button type="button" className="btn btn-ghost-danger" onClick={() => remove(close).catch((err) => setError(describeError(err)))} aria-label="Supprimer">
+              <button type="button" className="btn btn-ghost-danger" onClick={() => withTimeout(remove(close)).catch((err) => setError(describeError(err)))} aria-label="Supprimer">
                 <IconTrash size={20} />
               </button>
             )}

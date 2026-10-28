@@ -770,6 +770,47 @@ p {
   margin: 0;
   overflow-wrap: anywhere;
 }
+.stuck {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-top: 24px;
+}
+.stuck-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--terra-deep);
+  background: color-mix(in srgb, var(--terra) 14%, var(--card));
+}
+.stuck h1 {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 28px;
+  letter-spacing: -0.02em;
+}
+.stuck p,
+.stuck ol {
+  color: var(--ink-2);
+}
+.stuck ol {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.stuck .btn {
+  flex: none;
+  margin-top: 6px;
+}
+.stuck-detail {
+  font-size: 12.5px;
+  color: var(--muted) !important;
+}
 .footer-note {
   text-align: center;
   font-size: 12px;

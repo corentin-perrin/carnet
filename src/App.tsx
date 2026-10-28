@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import type { Category, Expense, Recurring } from './lib/db'
+import { db, type Category, type Expense, type Recurring } from './lib/db'
 import { monthOf, todayISO } from './lib/format'
-import { describeError } from './lib/errors'
+import { describeError, withTimeout } from './lib/errors'
 import { runRecurring } from './lib/recurring'
+import { StorageStuck } from './components/StorageStuck'
 import { useToast } from './components/Toast'
 import { BottomNav, type Tab } from './components/BottomNav'
 import { CategorySheet } from './components/CategorySheet'
@@ -24,12 +25,16 @@ export default function App() {
   const [month, setMonth] = useState(() => monthOf(todayISO()))
   const [sheet, setSheet] = useState<SheetState>(null)
   const [installPrompt, setInstallPrompt] = useState<InstallPrompt | null>(null)
+  const [storageStuck, setStorageStuck] = useState<string | null>(null)
   const toast = useToast()
 
   useEffect(() => {
     // Sans ça, Chrome peut effacer les données du site pour libérer de la place.
     navigator.storage?.persist?.()
-    runRecurring()
+    // Une base IndexedDB bloquée ne renvoie aucune erreur : on vérifie qu'elle répond avant tout.
+    withTimeout(db.categories.count())
+      .then(() => runRecurring())
+      .catch((err) => setStorageStuck(describeError(err)))
     // L'appli peut rester ouverte en arrière-plan plusieurs jours : on revérifie à chaque retour.
     const onVisible = () => {
       if (document.visibilityState === 'visible') runRecurring()
@@ -57,6 +62,14 @@ export default function App() {
 
   const closeSheet = () => setSheet(null)
   const editExpense = (expense?: Expense) => setSheet({ kind: 'expense', expense })
+
+  if (storageStuck) {
+    return (
+      <main className="screen">
+        <StorageStuck reason={storageStuck} />
+      </main>
+    )
+  }
 
   return (
     <>
