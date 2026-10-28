@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { IconNote, IconRepeat, IconTrash } from '@tabler/icons-react'
 import { db, type Expense } from '../lib/db'
-import { centsToInput, monthOf, parseAmount, todayISO } from '../lib/format'
+import { centsToInput, monthOf, parseAmount, shortDate, todayISO } from '../lib/format'
 import { useCategories } from '../lib/hooks'
 import { CategoryPicker } from './CategoryPicker'
 import { Sheet } from './Sheet'
@@ -62,7 +62,18 @@ export function ExpenseSheet({ expense, onClose }: Props) {
       note: note.trim() || undefined,
     }
 
-    if (isNew) {
+    if (isNew && repeat && data.date > todayISO()) {
+      // Échéance future : on programme seulement la récurrence, la dépense sera créée le jour venu.
+      await db.recurrings.add({
+        label: data.label,
+        amount: cents,
+        categoryId,
+        day: Number(data.date.slice(8, 10)),
+        startMonth: monthOf(data.date),
+        active: true,
+      })
+      toast(`Programmée pour le ${shortDate(data.date)}, puis chaque mois`)
+    } else if (isNew) {
       let recurringId: number | undefined
       if (repeat) {
         recurringId = await db.recurrings.add({
@@ -94,7 +105,7 @@ export function ExpenseSheet({ expense, onClose }: Props) {
   return (
     <Sheet title={isNew ? 'Nouvelle dépense' : 'Modifier la dépense'} onClose={onClose}>
       {(close) => (
-        <form
+        <form noValidate
           className="form"
           onSubmit={(e) => {
             e.preventDefault()
@@ -140,7 +151,7 @@ export function ExpenseSheet({ expense, onClose }: Props) {
 
           <label className="field">
             <span>Date</span>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} max={todayISO()} />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </label>
 
           {showNote ? (

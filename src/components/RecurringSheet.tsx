@@ -60,7 +60,7 @@ export function RecurringSheet({ recurring, onClose }: Props) {
   return (
     <Sheet title={isNew ? 'Nouvelle récurrence' : 'Dépense récurrente'} onClose={onClose}>
       {(close) => (
-        <form
+        <form noValidate
           className="form"
           onSubmit={(e) => {
             e.preventDefault()

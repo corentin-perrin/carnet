@@ -49,7 +49,7 @@ export function CategorySheet({ category, onClose }: Props) {
   return (
     <Sheet title={isNew ? 'Nouvelle catégorie' : 'Catégorie'} onClose={onClose}>
       {(close) => (
-        <form
+        <form noValidate
           className="form"
           onSubmit={(e) => {
             e.preventDefault()
